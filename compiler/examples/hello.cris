@@ -1,1 +1,3 @@
-print("Hello World")
+print Hello World
+print Welcome to CrisLang
+print Version 0.3

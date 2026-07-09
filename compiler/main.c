@@ -1,8 +1,9 @@
 #include<stdio.h>
 #include<conio.h>
+#include<string.h>
 int main()
 {
-    FILE *file=fopen("./examples/hello.cris","r");
+    FILE *file=fopen("compiler/examples/hello.cris","r");
     if(file==NULL)
     {
         printf("Error\n");
@@ -12,7 +13,10 @@ int main()
     char line[100];
     while(fgets(line,sizeof(line),file)!=NULL)
     {
-        printf("%s",line);
+        if(strncmp(line,"print",5)==0)
+        {
+            printf("%s",line+6);
+        }
     }
     fclose(file);
     return 0;
