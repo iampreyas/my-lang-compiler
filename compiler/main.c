@@ -23,6 +23,19 @@ void set_variable(char *name,int val)
     symbol_table[variable_count].value=val;
     variable_count++;
 }
+int get_variable(char *name,int *found)
+{
+    for(int i=0;i<variable_count;i++)
+    {
+        if(strcmp(symbol_table[i].name,name)==0)
+        {
+            *found=1;
+            return symbol_table[i].value;
+        }
+        *found=0;
+        return 0;
+    }
+}
 int main()
 {
     FILE *file=fopen("compiler/examples/hello.cris","r");
@@ -38,7 +51,20 @@ int main()
         printf("LINE:[%s]",line);
         if(strncmp(line,"print",5)==0)
         {
-            printf("%s",line+6);
+            char arg[50]={0};
+            if(sscanf(line+6,"%s",arg)==1)
+            {
+                int is_variable=0;
+                int val=get_variable(arg,&is_variable);
+                if(is_variable)
+                {
+                    printf("%d\n",val);
+                }
+                else
+                {
+                    printf("%s",line+6);
+                }
+            }
         }
         else if(strchr(line,'=')!=NULL)
         {
