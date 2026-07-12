@@ -32,10 +32,11 @@ int get_variable(char *name,int *found)
             *found=1;
             return symbol_table[i].value;
         }
-        *found=0;
-        return 0;
     }
+    *found=0;
+    return 0;
 }
+
 int main()
 {
     FILE *file=fopen("compiler/examples/hello.cris","r");
@@ -68,12 +69,51 @@ int main()
         }
         else if(strchr(line,'=')!=NULL)
         {
-            char var_name[50];
+            char var_name[50]={0};
+            char arg1[50]={0};
+            char arg2[50]={0};
+            char op=0;
             int var_value;
-            if(sscanf(line,"%49[^=]=%d",var_name,&var_value)==2)
+            if(sscanf(line,"%49[^=]=%[^+^-]%c%s",var_name,arg1,&op,arg2)==4)
             {
-                set_variable(var_name,var_value);
-                printf("[LOG]:Variable %s stored With value %d\n",var_name,var_value);
+                printf("var_name='%s'\n",var_name);
+                printf("arg1='%s'\n",arg1);
+                printf("op='%c'\n",op);
+                printf("arg1='%s'\n",arg1);
+                printf("arg2='%s'\n",arg2);
+                int is_var1=0,is_var2=0;
+                int val1=get_variable(arg1,&is_var1);
+                if(!is_var1) 
+                {
+                    val1=atoi(arg1);
+                }
+                int val2=get_variable(arg2,&is_var2);
+                if(!is_var2)
+                {
+                     val2=atoi(arg2);
+                }
+                printf("val1=%d\n",val1);
+                printf("val2=%d\n",val2);
+                int final_val=0;
+                if(op=='+') 
+                {
+                    final_val=val1+val2;
+                }
+                else if(op=='-')
+                {
+                     final_val=val1-val2;
+                }
+                set_variable(var_name,final_val);
+                printf("[LOG]: Math Calculation %s stored with value %d\n",var_name,final_val);
+            }
+            else
+            {
+                int var_value=0;
+                if(sscanf(line,"%[^=]=%d",var_name,&var_value)==2)
+                {
+                    set_variable(var_name,var_value);
+                    printf("[LOG]:Variable %s stored With value %d\n",var_name,var_value);
+                }
             }
         }
     }
