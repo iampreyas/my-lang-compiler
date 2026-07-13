@@ -47,10 +47,52 @@ int main()
     }
     printf("hello.cris opened successfully!\n");
     char line[100];
+    int execute_next_line=1;
     while(fgets(line,sizeof(line),file)!=NULL)
     {
+        line[strcspn(line, "\r\n")]=0;
+        if(!execute_next_line)
+        {
+            execute_next_line=1;
+            continue;
+        }
         printf("LINE:[%s]",line);
-        if(strncmp(line,"print",5)==0)
+        if(strncmp(line,"if",2)==0)
+        {
+            char arg1[50]={0},arg2[50]={0},comp_op=0;
+            if(sscanf(line+3,"%49[^<>=]%c%49s",arg1,&comp_op,arg2)==3)
+            {
+                int is_var1=0,is_var2=0;
+                int val=get_variable(arg1,&is_var1);
+                if(!is_var1)
+                {
+                    val=atoi(arg1);
+                }
+                int val2=get_variable(arg2,&is_var2);
+                if(!is_var2)
+                {
+                    val2=atoi(arg2);
+                }
+                if(comp_op=='>' && !(val>val2))
+                {
+                    execute_next_line=0;
+                }
+                else if(comp_op=='<' && !(val<val2))
+                {
+                    execute_next_line=0;
+                }
+                else if(comp_op=='=' && !(val==val2))
+                {
+                    execute_next_line=0;
+                }
+                else if(comp_op=='!' && (val==val2))
+                {
+                    execute_next_line=0;
+                }
+            }
+            continue;
+        }
+        else if(strncmp(line,"print",5)==0)
         {
             char arg[50]={0};
             if(sscanf(line+6,"%s",arg)==1)
@@ -63,7 +105,7 @@ int main()
                 }
                 else
                 {
-                    printf("%s",line+6);
+                    printf("%s\n",line+6);
                 }
             }
         }

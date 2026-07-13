@@ -5,3 +5,7 @@ print z
 print Hello World
 print Welcome to CrisLang
 print Version 0.3
+if x>y
+print x
+if x<y
+print y
