@@ -56,6 +56,10 @@ int main()
             execute_next_line=1;
             continue;
         }
+        if(line[0]=='#')
+        {
+            continue;
+        }
         printf("LINE:[%s]",line);
         if(strncmp(line,"if",2)==0)
         {
