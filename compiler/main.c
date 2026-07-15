@@ -60,6 +60,10 @@ int main()
         {
             continue;
         }
+        if(strlen(line)==0||line[0]=='\0')
+        {
+            continue;
+        }
         printf("LINE:[%s]",line);
         if(strncmp(line,"if",2)==0)
         {
