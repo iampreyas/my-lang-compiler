@@ -102,20 +102,21 @@ int main()
         }
         else if(strncmp(line,"print",5)==0)
         {
-            char arg[50]={0};
-            if(sscanf(line+6,"%s",arg)==1)
+            char format_string[100]={0};
+            char var_name[50]={0};
+            if(sscanf(line+6,"%[^,],%s",format_string,var_name)==2)
             {
                 int is_variable=0;
-                int val=get_variable(arg,&is_variable);
+                int val=get_variable(var_name,&is_variable);
                 if(is_variable)
                 {
-                    printf("%d\n",val);
-                }
-                else
-                {
-                    printf("%s\n",line+6);
+                    printf(format_string,val);
+                    printf("\n");
+                    continue;
                 }
             }
+            printf("%s\n",line+6);
+            continue;
         }
         else if(strchr(line,'=')!=NULL)
         {

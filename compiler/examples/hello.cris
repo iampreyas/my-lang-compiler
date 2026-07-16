@@ -9,5 +9,6 @@ if x>y
 print x
 if x<y
 print y
+print Value of z is %d, z
 
 #Check comment
