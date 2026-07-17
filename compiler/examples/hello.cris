@@ -1,14 +1,7 @@
-x=10
-y=20
-z=x+y
-print z
-print Hello World
-print Welcome to CrisLang
-print Version 0.3
+x=5
+y=10
 if x>y
-print x
-if x<y
-print y
-print Value of z is %d, z
-
-#Check comment
+print x is bigger
+else
+print y is bigger
+endif

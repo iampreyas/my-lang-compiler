@@ -2,6 +2,7 @@
 #include<conio.h>
 #include<string.h>
 #include<stdlib.h>
+#include<math.h>
 typedef struct
 {
     char name[50];
@@ -48,12 +49,12 @@ int main()
     printf("hello.cris opened successfully!\n");
     char line[100];
     int execute_next_line=1;
+    int run_block=1;
     while(fgets(line,sizeof(line),file)!=NULL)
     {
         line[strcspn(line, "\r\n")]=0;
-        if(!execute_next_line)
+        if(execute_next_line==0 && strncmp(line,"else",4)!=0 && strncmp(line,"endif",5)!=0 && strncmp(line,"}",1)!=0)
         {
-            execute_next_line=1;
             continue;
         }
         if(line[0]=='#')
@@ -64,7 +65,7 @@ int main()
         {
             continue;
         }
-        printf("LINE:[%s]",line);
+        printf("LINE:[%s]\n",line);
         if(strncmp(line,"if",2)==0)
         {
             char arg1[50]={0},arg2[50]={0},comp_op=0;
@@ -100,11 +101,21 @@ int main()
             }
             continue;
         }
+        else if(strcmp(line,"else")==0)
+        {
+            execute_next_line=!execute_next_line;
+            continue;
+        }
+        else if(strcmp(line,"endif")==0||strcmp(line,"}")==0)
+        {
+            execute_next_line=1;
+            continue;
+        }
         else if(strncmp(line,"print",5)==0)
         {
             char format_string[100]={0};
             char var_name[50]={0};
-            if(sscanf(line+6,"%[^,],%s",format_string,var_name)==2)
+            if(sscanf(line+6,"%[^,], %s",format_string,var_name)==2)
             {
                 int is_variable=0;
                 int val=get_variable(var_name,&is_variable);
@@ -125,7 +136,7 @@ int main()
             char arg2[50]={0};
             char op=0;
             int var_value;
-            if(sscanf(line,"%49[^=]=%[^+^-]%c%s",var_name,arg1,&op,arg2)==4)
+            if(sscanf(line,"%49[^=]=%[^+*-/%^]%c%s",var_name,arg1,&op,arg2)==4)
             {
                 printf("var_name='%s'\n",var_name);
                 printf("arg1='%s'\n",arg1);
@@ -153,6 +164,38 @@ int main()
                 else if(op=='-')
                 {
                      final_val=val1-val2;
+                }
+                else if(op=='*')
+                {
+                    final_val=val1*val2;
+                }
+                else if(op=='/')
+                {
+                    if(val2!=0)
+                    {
+                        final_val=val1/val2;
+                    }
+                    else
+                    {
+                        printf("[ERROR] Division by Zero\n");
+                        final_val=0;
+                    }
+                }
+                else if(op=='%')
+                {
+                    if(val2!=0)
+                    {
+                        final_val=val1%val2;
+                    }
+                    else
+                    {
+                        printf("[ERROR] modulo by zero\n");
+                        final_val=0;
+                    }
+                }
+                else if(op=='^')
+                {
+                    final_val=(int)pow(val1,val2);
                 }
                 set_variable(var_name,final_val);
                 printf("[LOG]: Math Calculation %s stored with value %d\n",var_name,final_val);
