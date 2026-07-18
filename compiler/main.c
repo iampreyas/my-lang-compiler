@@ -50,10 +50,18 @@ int main()
     char line[100];
     int execute_next_line=1;
     int run_block=1;
+    int line_num=0;
+    long loop_start_pos=0;
+    int in_loop=0;
+    long pos=ftell(file);
+    int loop_condition_true=1;
     while(fgets(line,sizeof(line),file)!=NULL)
     {
+        long current_line_start=pos;
+        pos=ftell(file);
+        line_num++;
         line[strcspn(line, "\r\n")]=0;
-        if(execute_next_line==0 && strncmp(line,"else",4)!=0 && strncmp(line,"endif",5)!=0 && strncmp(line,"}",1)!=0)
+        if(execute_next_line==0 && strncmp(line,"else",4)!=0 && strncmp(line,"endif",5)!=0 && strncmp(line,"}",1)!=0 && strncmp(line,"endwhile",8)!=0)
         {
             continue;
         }
@@ -98,6 +106,61 @@ int main()
                 {
                     execute_next_line=0;
                 }
+            }
+            continue;
+        }
+        else if(strncmp(line,"while",5)==0)
+        {
+            if(!in_loop)
+            {
+                loop_start_pos=current_line_start;
+                in_loop=1;
+            }
+            char arg1[50]={0},arg2[50]={0},comp_op=0;
+            if(sscanf(line+6,"%49[^<>=]%c%49s",arg1,&comp_op,arg2)==3)
+            {
+                int is_var1=0,is_var2=0;
+                int val=get_variable(arg1,&is_var1);
+                if(!is_var1)
+                {
+                    val=atoi(arg1);
+                }
+                int val2=get_variable(arg2,&is_var2);
+                if(!is_var2)
+                {
+                    val2=atoi(arg2);
+                }
+                if(comp_op=='>'&&(val>val2))
+                {
+                    loop_condition_true=1;
+                }
+                else if(comp_op=='<'&&(val<val2))
+                {
+                    loop_condition_true=1;
+                }
+                else if(comp_op=='='&&(val==val2))
+                {
+                    loop_condition_true=1;
+                }
+                else
+                {
+                    loop_condition_true=0;
+                    execute_next_line=0;
+                }
+            }
+            continue;
+        }
+        else if(strcmp(line,"endwhile")==0||strcmp(line,"end_while")==0)
+        {
+            if(loop_condition_true)
+            {
+                fseek(file,loop_start_pos,SEEK_SET);
+                pos=loop_start_pos;
+            }
+            else
+            {
+                execute_next_line=1;
+                in_loop=0;
             }
             continue;
         }
@@ -177,7 +240,7 @@ int main()
                     }
                     else
                     {
-                        printf("[ERROR] Division by Zero\n");
+                        printf("[ERROR on line %d] Division by Zero\n");
                         final_val=0;
                     }
                 }
@@ -189,7 +252,7 @@ int main()
                     }
                     else
                     {
-                        printf("[ERROR] modulo by zero\n");
+                        printf("[ERROR on line %d] modulo by zero\n");
                         final_val=0;
                     }
                 }
