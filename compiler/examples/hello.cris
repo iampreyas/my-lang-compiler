@@ -1,6 +1,2 @@
-i=1
-while i<3
-print Loop running value of i is %d,i 
-i=i+1
-endwhile
-print loop finished
+msg="CrisLang"
+print my language name is %s,msg

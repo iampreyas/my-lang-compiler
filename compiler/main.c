@@ -7,6 +7,8 @@ typedef struct
 {
     char name[50];
     int value;
+    char str_value[100];
+    int is_string;
 }Variable;
 Variable symbol_table[100];
 int variable_count=0;
@@ -23,7 +25,26 @@ void set_variable(char *name,int val)
     }
     strcpy(symbol_table[variable_count].name,name);
     symbol_table[variable_count].value=val;
+    symbol_table[variable_count].is_string=0;
     printf("[SET] %s=%d\n",name,val);
+    variable_count++;
+}
+void set_string_variable(char *name,char *str_val)
+{
+    for(int i=0;i<variable_count;i++)
+    {
+        if(strcmp(symbol_table[i].name,name)==0)
+        {
+            strcpy(symbol_table[i].str_value,str_val);
+            symbol_table[i].is_string=1;
+            printf("[SET] %s=\"%s\"\n",name,str_val);
+            return;
+        }
+    }
+    strcpy(symbol_table[variable_count].name,name);
+    strcpy(symbol_table[variable_count].str_value,str_val);
+    symbol_table[variable_count].is_string=1;
+    printf("[SET] %s=\"%s\"\n",name,str_val);
     variable_count++;
 }
 int get_variable(char *name,int *found)
@@ -194,7 +215,22 @@ int main()
                 int val=get_variable(var_name,&is_variable);
                 if(is_variable)
                 {
-                    printf(format_string,val);
+                    int idx=-1;
+                    for(int i=0;i<variable_count;i++)
+                    {
+                        if(strcmp(symbol_table[i].name,var_name)==0)
+                        {
+                            idx=i;
+                        }
+                    }
+                    if(idx!=-1 && symbol_table[idx].is_string==1)
+                    {
+                        printf(format_string,symbol_table[idx].str_value);
+                    }
+                    else
+                    {
+                        printf(format_string,val);
+                    }
                     printf("\n");
                     continue;
                 }
@@ -205,7 +241,22 @@ int main()
                 int val=get_variable(var_name,&is_variable);
                 if(is_variable)
                 {
-                    printf(format_string,val);
+                    int idx=-1;
+                    for(int i=0;i<variable_count;i++)
+                    {
+                        if(strcmp(symbol_table[i].name,var_name)==0)
+                        {
+                            idx=i;
+                        }
+                    }
+                    if(idx!=-1 && symbol_table[idx].is_string==1)
+                    {
+                        printf(format_string,symbol_table[idx].str_value);
+                    }
+                    else
+                    {
+                        printf(format_string,val);
+                    }
                     printf("\n");
                     continue;
                 }
@@ -216,10 +267,27 @@ int main()
         else if(strchr(line,'=')!=NULL)
         {
             char var_name[50]={0};
+            char str_val[100]={0};
             char arg1[50]={0};
             char arg2[50]={0};
             char op=0;
             int var_value;
+            if(sscanf(line,"%49[^=]=\"%99[^\"]\"",var_name,str_val)==2)
+            {
+                char *trimmed_var=var_name;
+                while(*trimmed_var==' ')
+                {
+                    trimmed_var++;
+                }
+                char *end=trimmed_var+strlen(trimmed_var)-1;
+                while(end>trimmed_var && *end==' ')
+                {
+                    *end='\0';
+                    end--;
+                }
+                set_string_variable(trimmed_var,str_val);
+                continue;
+            }
             if(sscanf(line,"%49[^=]=%[^+*-/%^]%c%s",var_name,arg1,&op,arg2)==4)
             {
                 printf("var_name='%s'\n",var_name);
