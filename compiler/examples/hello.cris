@@ -1,2 +1,3 @@
-msg="CrisLang"
-print my language name is %s,msg
+arr=[10,20,30]
+x=arr[1]
+print value at index 1 is %d,x

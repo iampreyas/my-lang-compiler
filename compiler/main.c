@@ -9,6 +9,9 @@ typedef struct
     int value;
     char str_value[100];
     int is_string;
+    int array_values[50];
+    int is_array;
+    int array_size;
 }Variable;
 Variable symbol_table[100];
 int variable_count=0;
@@ -27,6 +30,32 @@ void set_variable(char *name,int val)
     symbol_table[variable_count].value=val;
     symbol_table[variable_count].is_string=0;
     printf("[SET] %s=%d\n",name,val);
+    variable_count++;
+}
+void set_array_variable(char *name,int *values,int size)
+{
+    for(int i=0;i<variable_count;i++)
+    {
+        if(strcmp(symbol_table[i].name,name)==0)
+        {
+            symbol_table[i].is_array=1;
+            symbol_table[i].array_size=size;
+            for(int j=0;j<size;j++)
+            {
+                symbol_table[i].array_values[j]=values[j];
+            }
+            printf("[SET ARRAY] %s with %d elements\n",name,size);
+            return;
+        }
+    }
+    strcpy(symbol_table[variable_count].name,name);
+    symbol_table[variable_count].is_array=1;
+    symbol_table[variable_count].array_size=size;
+    for(int j=0;j<size;j++)
+    {
+        symbol_table[variable_count].array_values[j]=values[j];
+    }
+    printf("[SET ARRAY] %s with %d elements\n",name,size);
     variable_count++;
 }
 void set_string_variable(char *name,char *str_val)
@@ -270,8 +299,72 @@ int main()
             char str_val[100]={0};
             char arg1[50]={0};
             char arg2[50]={0};
+            char array_str[100]={0};
             char op=0;
             int var_value;
+            if(sscanf(line,"%49[^=]=[%99[^]]]",var_name,array_str)==2)
+            {
+                char *trimmed_var=var_name;
+                while(*trimmed_var==' ')
+                {
+                    trimmed_var++;
+                }
+                char *end=trimmed_var+strlen(trimmed_var)-1;
+                while(end>trimmed_var && *end==' ')
+                {
+                    *end='\0';
+                    end--;
+                }
+                int values[50];
+                int count=0;
+                char *token=strtok(array_str,",");
+                while(token!=NULL && count<50)
+                {
+                    values[count++]=atoi(token);
+                    token=strtok(NULL,",");
+                }
+                set_array_variable(trimmed_var,values,count);
+                continue;
+            }
+            char source_arr[50]={0};
+            int index=0;
+            if(sscanf(line,"%49[^=]=%49[^[][%d]",var_name,source_arr,&index)==3)
+            {
+                char *trimmed_var=var_name;
+                while(*trimmed_var==' ')
+                {
+                    trimmed_var++;
+                }
+                char *end=trimmed_var+strlen(trimmed_var)-1;
+                while(end>trimmed_var && *end==' ')
+                {
+                    *end='\0';
+                    end--;
+                }
+                char *trimmed_arr=source_arr;
+                while(*trimmed_arr==' ')
+                {
+                    trimmed_arr++;
+                }
+                end=trimmed_arr+strlen(trimmed_arr)-1;
+                while(end>trimmed_arr && *end==' ')
+                {
+                    *end='\0';
+                    end--;
+                }
+                for(int i=0;i<variable_count;i++)
+                {
+                    if(strcmp(symbol_table[i].name,trimmed_arr)==0 && symbol_table[i].is_array)
+                    {
+                        if(index>=0 && index<symbol_table[i].array_size)
+                        {
+                            set_variable(trimmed_var,symbol_table[i].array_values[index]);
+                        }
+                        break;
+                    }
+                }
+                continue;
+            }
             if(sscanf(line,"%49[^=]=\"%99[^\"]\"",var_name,str_val)==2)
             {
                 char *trimmed_var=var_name;
