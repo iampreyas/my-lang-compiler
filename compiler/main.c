@@ -365,6 +365,23 @@ int main()
                 }
                 continue;
             }
+            int update_idx=0,update_val=0;
+            if(sscanf(line,"%49[a-zA-Z0-9_][%d]=%d",var_name,&update_idx,&update_val)==3)
+            {
+                for(int i=0;i<variable_count;i++)
+                {
+                    if(strcmp(symbol_table[i].name,var_name)==0 && symbol_table[i].is_array)
+                    {
+                        if(update_idx>=0 && update_idx<symbol_table[i].array_size)
+                        {
+                            symbol_table[i].array_values[update_idx]=update_val;
+                            printf("[UPDATE ARRAY] %s[%d]=%d\n",var_name,update_idx,update_val);
+                        }
+                        break;
+                    }
+                }
+                continue;
+            }
             if(sscanf(line,"%49[^=]=\"%99[^\"]\"",var_name,str_val)==2)
             {
                 char *trimmed_var=var_name;

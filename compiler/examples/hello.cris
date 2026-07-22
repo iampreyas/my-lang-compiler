@@ -1,3 +1,4 @@
 arr=[10,20,30]
+arr[1]=50
 x=arr[1]
-print value at index 1 is %d,x
+print update value is %d,x
