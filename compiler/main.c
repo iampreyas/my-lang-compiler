@@ -382,6 +382,42 @@ int main()
                 }
                 continue;
             }
+            char len_arr_name[50]={0};
+            if(sscanf(line," %49[a-zA-Z0-9_]=len(%49[a-zA-z0-9_])",var_name,len_arr_name)==2||sscanf(line,"%49[^=]=len(%49[^)])",var_name,len_arr_name)==2)
+            {
+                char *trimmed_var=var_name;
+                while(*trimmed_var==' ')
+                {
+                    trimmed_var++;
+                }
+                char *end=trimmed_var+strlen(trimmed_var)-1;
+                while(end>trimmed_var && *end==' ')
+                {
+                    *end='\0';
+                    end--;
+                }
+                char *trimmed_arr=len_arr_name;
+                while(*trimmed_arr==' ')
+                {
+                    trimmed_arr++;
+                }
+                end=trimmed_arr+strlen(trimmed_arr)-1;
+                while(end>trimmed_arr && *end==' ')
+                {
+                    *end='\0';
+                    end--;
+                }
+                for(int i=0;i<variable_count;i++)
+                {
+                    if(strcmp(symbol_table[i].name,trimmed_arr)==0 && symbol_table[i].is_array)
+                    {
+                        set_variable(trimmed_var,symbol_table[i].array_size);
+                        printf("[ARRAY LEN] %s=%d\n",trimmed_var,symbol_table[i].array_size);
+                        break;
+                    }
+                }
+                continue;
+            }
             if(sscanf(line,"%49[^=]=\"%99[^\"]\"",var_name,str_val)==2)
             {
                 char *trimmed_var=var_name;
