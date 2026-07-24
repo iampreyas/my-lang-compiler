@@ -475,7 +475,7 @@ int main()
                     }
                     else
                     {
-                        printf("[ERROR on line %d] Division by Zero\n");
+                        printf("[ERROR on line %d] Division by Zero\n",line_num);
                         final_val=0;
                     }
                 }
