@@ -19,6 +19,10 @@ ASTNode* create_node(NodeType type,const char* name)
     {
         strcpy(node->name,name);
     }
+    else
+    {
+        node->name[0]='\0';
+    }
     node->left=NULL;
     node->right=NULL;
     return node;

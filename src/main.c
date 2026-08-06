@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include "../include/parser.h"
 #include "../include/lexer.h"
+#include "../include/eval.h"
 void print_ast(ASTNode *node,int level)
 {
     if(!node)
@@ -28,6 +29,10 @@ int main()
     {
         printf("---AST Tree Generated Successfully---\n");
         print_ast(root,0);
+        printf("\n---Running Evaluator---\n");
+        environment env;
+        env_init(&env);
+        eval(root,&env);
     }
     else
     {
