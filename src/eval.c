@@ -30,6 +30,14 @@ int eval(ASTNode *node,environment *env)
     {
         return atoi(node->name);
     }
+    if(node->type==NODE_ADD)
+    {
+        return eval(node->left,env) + eval(node->right,env);
+    }
+    if(node->type==NODE_SUB)
+    {
+        return eval(node->left,env) - eval(node->right,env);
+    }
     if(node->type==NODE_ASSIGN)
     {
         int val=eval(node->right,env);

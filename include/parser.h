@@ -7,6 +7,8 @@ typedef enum
     NODE_PRINT,
     NODE_INT,
     NODE_VAR,
+    NODE_ADD,
+    NODE_SUB,
 }NodeType;
 typedef struct ASTNode
 {

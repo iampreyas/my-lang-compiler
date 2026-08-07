@@ -27,6 +27,38 @@ ASTNode* create_node(NodeType type,const char* name)
     node->right=NULL;
     return node;
 }
+ASTNode* parse_primary(Parser *parser)
+{
+    if(parser->current_token.type==TOKEN_INT)
+    {
+        ASTNode *node=create_node(NODE_INT,parser->current_token.lexeme);
+        advance(parser);
+        return node;
+    }
+    if(parser->current_token.type==TOKEN_IDENTIFIER)
+    {
+        ASTNode *node=create_node(NODE_VAR,parser->current_token.lexeme);
+        advance(parser);
+        return node;
+    }
+    return NULL;
+}
+ASTNode* parse_expression(Parser *parser)
+{
+    ASTNode *left=parse_primary(parser);
+    while(parser->current_token.type==TOKEN_PLUS||parser->current_token.type==TOKEN_MINUS)
+    {
+        TokenType op=parser->current_token.type;
+        advance(parser);
+        NodeType node_type=(op==TOKEN_PLUS) ? NODE_ADD : NODE_SUB;
+        const char* op_str=(op==TOKEN_PLUS) ? "+" : "-";
+        ASTNode *new_node=create_node(node_type,op_str);
+        new_node->left=left;
+        new_node->right=parse_primary(parser);
+        left=new_node;
+    }
+    return left;
+}
 ASTNode* parse_statement(Parser *parser)
 {
     if(parser->current_token.type==TOKEN_IDENTIFIER)
@@ -37,16 +69,12 @@ ASTNode* parse_statement(Parser *parser)
         if(parser->current_token.type==TOKEN_ASSIGN)
         {
             advance(parser);
-            if(parser->current_token.type==TOKEN_INT)
-            {
-                ASTNode *var=create_node(NODE_VAR,var_name);
-                ASTNode *val=create_node(NODE_INT,parser->current_token.lexeme);
-                ASTNode *assign=create_node(NODE_ASSIGN,"=");
-                assign->left=var;
-                assign->right=val;
-                advance(parser);
-                return assign;
-            }
+            ASTNode *expr=parse_expression(parser);
+            ASTNode *var=create_node(NODE_VAR,var_name);
+            ASTNode *assign=create_node(NODE_ASSIGN,"=");
+            assign->left=var;
+            assign->right=expr;
+            return assign;
         }
     }
     return NULL;
