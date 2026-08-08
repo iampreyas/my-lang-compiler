@@ -38,6 +38,20 @@ int eval(ASTNode *node,environment *env)
     {
         return eval(node->left,env) - eval(node->right,env);
     }
+    if(node->type==NODE_MUL)
+    {
+        return eval(node->left,env) * eval(node->right,env);
+    }
+    if(node->type==NODE_DIV)
+    {
+        int right_val=eval(node->right,env);
+        if(right_val==0)
+        {
+            printf("[ERROR] Division by zero\n");
+            exit(1);
+        }
+        return eval(node->left,env) / right_val;
+    }
     if(node->type==NODE_ASSIGN)
     {
         int val=eval(node->right,env);

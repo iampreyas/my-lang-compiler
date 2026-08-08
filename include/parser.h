@@ -9,6 +9,8 @@ typedef enum
     NODE_VAR,
     NODE_ADD,
     NODE_SUB,
+    NODE_MUL,
+    NODE_DIV
 }NodeType;
 typedef struct ASTNode
 {

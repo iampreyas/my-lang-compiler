@@ -14,7 +14,9 @@ typedef enum
     TOKEN_RBRACKET,
     TOKEN_COMMA,
     TOKEN_PRINT,
-    TOKEN_UNKNOWN
+    TOKEN_MUL,
+    TOKEN_DIV,
+    TOKEN_UNKNOWN,
 }TokenType;
 typedef struct
 {

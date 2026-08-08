@@ -43,9 +43,25 @@ ASTNode* parse_primary(Parser *parser)
     }
     return NULL;
 }
-ASTNode* parse_expression(Parser *parser)
+ASTNode* parse_term(Parser *parser)
 {
     ASTNode *left=parse_primary(parser);
+    while(parser->current_token.type==TOKEN_MUL || parser->current_token.type==TOKEN_DIV)
+    {
+        TokenType op=parser->current_token.type;
+        advance(parser);
+        NodeType node_type=(op==TOKEN_MUL) ? NODE_MUL : NODE_DIV;
+        const char* op_str=(op==TOKEN_MUL) ? "*" : "/";
+        ASTNode *new_node=create_node(node_type,op_str);
+        new_node->left=left;
+        new_node->right=parse_primary(parser);
+        left=new_node;
+    }
+    return left;
+}
+ASTNode* parse_expression(Parser *parser)
+{
+    ASTNode *left=parse_term(parser);
     while(parser->current_token.type==TOKEN_PLUS||parser->current_token.type==TOKEN_MINUS)
     {
         TokenType op=parser->current_token.type;
@@ -54,7 +70,7 @@ ASTNode* parse_expression(Parser *parser)
         const char* op_str=(op==TOKEN_PLUS) ? "+" : "-";
         ASTNode *new_node=create_node(node_type,op_str);
         new_node->left=left;
-        new_node->right=parse_primary(parser);
+        new_node->right=parse_term(parser);
         left=new_node;
     }
     return left;

@@ -87,6 +87,12 @@ Token lexer_next_token(Lexer *lexer)
         case '-':
             t.type = TOKEN_MINUS;
             break;
+        case '*':
+            t.type = TOKEN_MUL;
+            break;
+        case '/':
+            t.type = TOKEN_DIV;
+            break;
         case '(':
             t.type = TOKEN_LPAREN;
             break;

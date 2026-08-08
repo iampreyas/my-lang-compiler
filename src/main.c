@@ -19,7 +19,7 @@ void print_ast(ASTNode *node,int level)
 }
 int main()
 {
-    const char *code="x=10 + 7";
+    const char *code="x=10 + 2 * 5";
     Lexer lexer;
     lexer_init(&lexer,code);
     Parser parser;
