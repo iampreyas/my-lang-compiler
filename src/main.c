@@ -3,18 +3,19 @@
 #include "../include/parser.h"
 #include "../include/lexer.h"
 #include "../include/eval.h"
-char* read_file=fopen(filename,"rb");
-if(!file)
+char* read_file(const char *filename)
 {
-    printf("[ERROR] File '%s' not founded\n",filename);
-    return NULL;
-}
-fseek(file,0,SEEK_END);
-long size=ftell(file);
-fseek(file,0,SEEK_SET);
-char *buffer=(char *)malloc(size+1)
-{
-    if(!buffer)
+    FILE *file=fopen(filename,"rb");
+    if (!file)
+    {
+        printf("[ERROR] File '%s' not founded\n",filename);
+        return NULL;
+    }
+    fseek(file,0,SEEK_END);
+    long size=ftell(file);
+    fseek(file,0,SEEK_SET);
+    char *buffer=(char *)malloc(size+1);
+    if (!buffer)
     {
         printf("[ERROR] Memory allocation failed\n");
         fclose(file);
@@ -39,9 +40,18 @@ void print_ast(ASTNode *node,int level)
     print_ast(node->left,level+1);
     print_ast(node->right,level+1);
 }
-int main()
+int main(int argc,char *argv[])
 {
-    const char *code="x=10 + 2 * 5";
+    if(argc<2)
+    {
+        printf("Usage: %s <filename.cris>\n",argv[0]);
+        return 1;
+    }
+    char *code=read_file(argv[1]);
+    if(!code)
+    {
+        return 1;
+    }
     Lexer lexer;
     lexer_init(&lexer,code);
     Parser parser;
@@ -60,5 +70,6 @@ int main()
     {
         printf("Parsing error!\n");
     }
+    free(code);
     return 0;
 }
