@@ -20,11 +20,36 @@ static void set_var(environment *env,const char *name,int value)
     env->vars[env->count].value=value;
     env->count++;
 }
+static int get_var(environment *env, const char *name)
+{
+    for(int i=0;i<env->count;i++)
+    {
+        if(strcmp(env->vars[i].name,name)==0)
+        {
+            return env->vars[i].value;
+        }
+    }
+    printf("[ERROR] Undefined variable '%s'\n", name);
+    exit(1);
+}
 int eval(ASTNode *node,environment *env)
 {
     if(!node)
     {
         return 0;
+    }
+    if(node->type==NODE_BLOCK)
+    {
+        int last_val=0;
+        for(int i=0;i<node->child_count;i++)
+        {
+            last_val=eval(node->children[i],env);
+        }
+        return last_val;
+    }
+    if(node->type==NODE_VAR)
+    {
+        return get_var(env,node->name);
     }
     if(node->type==NODE_INT)
     {

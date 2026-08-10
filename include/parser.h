@@ -7,6 +7,7 @@ typedef enum
     NODE_PRINT,
     NODE_INT,
     NODE_VAR,
+    NODE_BLOCK,
     NODE_ADD,
     NODE_SUB,
     NODE_MUL,
@@ -15,9 +16,12 @@ typedef enum
 typedef struct ASTNode
 {
     NodeType type;
-    char name[64];
+    char name[100];
+    int value;
     struct ASTNode *left;
     struct ASTNode *right;
+    struct ASTNode **children;
+    int child_count;
 }ASTNode;
 typedef struct
 {
@@ -26,4 +30,5 @@ typedef struct
 }Parser;
 void parser_init(Parser *parser,Lexer *lexer);
 ASTNode* parse_statement(Parser *parser);
+ASTNode* parse_program(Parser *parser);
 #endif

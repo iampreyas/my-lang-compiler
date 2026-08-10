@@ -37,8 +37,18 @@ void print_ast(ASTNode *node,int level)
         printf(" ");
     }
     printf("Node: %s (Type: %d)\n",node->name,node->type);
-    print_ast(node->left,level+1);
-    print_ast(node->right,level+1);
+    if(node->type==NODE_BLOCK)
+    {
+        for(int i=0;i<node->child_count;i++)
+        {
+            print_ast(node->children[i],level + 1);
+        }
+    }
+    else
+    {
+        print_ast(node->left,level+1);
+        print_ast(node->right,level+1);
+    }
 }
 int main(int argc,char *argv[])
 {
@@ -56,7 +66,7 @@ int main(int argc,char *argv[])
     lexer_init(&lexer,code);
     Parser parser;
     parser_init(&parser,&lexer);
-    ASTNode *root=parse_statement(&parser);
+    ASTNode *root=parse_program(&parser);
     if(root)
     {
         printf("---AST Tree Generated Successfully---\n");
@@ -65,6 +75,8 @@ int main(int argc,char *argv[])
         environment env;
         env_init(&env);
         eval(root,&env);
+        printf("Final Result: %d\n",eval(root,&env));
+        fflush(stdout);
     }
     else
     {

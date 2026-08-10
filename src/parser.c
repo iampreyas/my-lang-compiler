@@ -25,6 +25,8 @@ ASTNode* create_node(NodeType type,const char* name)
     }
     node->left=NULL;
     node->right=NULL;
+    node->children=NULL;
+    node->child_count=0;
     return node;
 }
 ASTNode* parse_primary(Parser *parser)
@@ -94,4 +96,27 @@ ASTNode* parse_statement(Parser *parser)
         }
     }
     return NULL;
+}
+void add_child(ASTNode *parent,ASTNode *child)
+{
+    if(!parent||!child)
+    {
+        return;
+    }
+    parent->children=realloc(parent->children,sizeof(ASTNode*) * (parent->child_count + 1));
+    parent->children[parent->child_count]=child;
+    parent->child_count++;
+}
+ASTNode* parse_program(Parser *parser)
+{
+    ASTNode *block=create_node(NODE_BLOCK,"BLOCK");
+    while(parser->current_token.type!=TOKEN_EOF)
+    {
+        ASTNode *stmt=parse_statement(parser);
+        if(stmt)
+        {
+            add_child(block,stmt);
+        }
+    }
+    return block;
 }
