@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include "../include/parser.h"
+void add_child(ASTNode *parent,ASTNode *child);
 static void advance(Parser *parser)
 {
     parser->current_token=lexer_next_token(parser->lexer);
@@ -79,6 +80,22 @@ ASTNode* parse_expression(Parser *parser)
 }
 ASTNode* parse_statement(Parser *parser)
 {
+    if(parser->current_token.type==TOKEN_PRINT)
+    {
+        advance(parser);
+        if(parser->current_token.type==TOKEN_LPAREN)
+        {
+            advance(parser);
+        }
+        ASTNode *expr=parse_expression(parser);
+        if(parser->current_token.type==TOKEN_RPAREN)
+        {
+            advance(parser);
+        }
+        ASTNode *print_node=create_node(NODE_PRINT,"print");
+        add_child(print_node,expr);
+        return print_node;
+    }
     if(parser->current_token.type==TOKEN_IDENTIFIER)
     {
         char var_name[64];
@@ -95,7 +112,7 @@ ASTNode* parse_statement(Parser *parser)
             return assign;
         }
     }
-    return NULL;
+    return parse_expression(parser);
 }
 void add_child(ASTNode *parent,ASTNode *child)
 {
