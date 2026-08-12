@@ -49,9 +49,21 @@ int eval(ASTNode *node,environment *env)
     }
     if(node->type==NODE_PRINT)
     {
-        int val=eval(node->children[0],env);
-        printf("> %d\n",val);
-        return val;
+        ASTNode *child=node->children[0];
+        if(child->type==NODE_STRING)
+        {
+            printf("> %s\n",child->name);
+        }
+        else
+        {
+            int val=eval(node->children[0],env);
+            printf("> %d\n",val);
+            return val;
+        }
+    }
+    if(node->type==NODE_STRING)
+    {
+        return 0;
     }
     if(node->type==NODE_VAR)
     {

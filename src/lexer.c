@@ -50,7 +50,24 @@ Token lexer_next_token(Lexer *lexer)
         t.lexeme[i]='\0';
         return t;
     }
-
+    if(peek(lexer)=='"')
+    {
+        advance(lexer);
+        Token t;
+        t.line=lexer->line;
+        t.type=TOKEN_STRING;
+        int i=0;
+        while(peek(lexer) != '"' && peek(lexer) != '\0' && i<63)
+        {
+            t.lexeme[i++]=advance(lexer);
+        }
+        t.lexeme[i]='\0';
+        if(peek(lexer)=='"')
+        {
+            advance(lexer);
+        }
+        return t;
+    }
     if(isalpha(c) || c == '_') 
     {
         Token t;

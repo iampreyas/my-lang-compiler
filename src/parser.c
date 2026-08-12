@@ -38,6 +38,12 @@ ASTNode* parse_primary(Parser *parser)
         advance(parser);
         return node;
     }
+    if(parser->current_token.type==TOKEN_STRING)
+    {
+        ASTNode *node=create_node(NODE_STRING,parser->current_token.lexeme);
+        advance(parser);
+        return node;
+    }
     if(parser->current_token.type==TOKEN_IDENTIFIER)
     {
         ASTNode *node=create_node(NODE_VAR,parser->current_token.lexeme);

@@ -14,6 +14,7 @@ typedef enum
     TOKEN_RBRACKET,
     TOKEN_COMMA,
     TOKEN_PRINT,
+    TOKEN_STRING,
     TOKEN_MUL,
     TOKEN_DIV,
     TOKEN_UNKNOWN,

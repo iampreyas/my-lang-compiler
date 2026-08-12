@@ -8,6 +8,7 @@ typedef enum
     NODE_INT,
     NODE_VAR,
     NODE_BLOCK,
+    NODE_STRING,
     NODE_ADD,
     NODE_SUB,
     NODE_MUL,
