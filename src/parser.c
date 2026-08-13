@@ -84,6 +84,31 @@ ASTNode* parse_expression(Parser *parser)
     }
     return left;
 }
+ASTNode* parse_comparison(Parser *parser)
+{
+    ASTNode *left = parse_expression(parser);
+    while(parser->current_token.type == TOKEN_LT ||
+          parser->current_token.type == TOKEN_GT ||
+          parser->current_token.type == TOKEN_EQ ||
+          parser->current_token.type == TOKEN_NEQ)
+    {
+        TokenType op = parser->current_token.type;
+        advance(parser);
+
+        NodeType node_type;
+        const char* op_str;
+        if(op==TOKEN_LT)      { node_type = NODE_LT;  op_str = "<"; }
+        else if(op==TOKEN_GT) { node_type = NODE_GT;  op_str = ">"; }
+        else if(op==TOKEN_EQ) { node_type = NODE_EQ;  op_str = "=="; }
+        else                  { node_type = NODE_NEQ; op_str = "!="; }
+
+        ASTNode *new_node = create_node(node_type, op_str);
+        new_node->left = left;
+        new_node->right = parse_expression(parser);
+        left = new_node;
+    }
+    return left;
+}
 ASTNode* parse_statement(Parser *parser)
 {
     if(parser->current_token.type==TOKEN_PRINT)
@@ -93,7 +118,7 @@ ASTNode* parse_statement(Parser *parser)
         {
             advance(parser);
         }
-        ASTNode *expr=parse_expression(parser);
+        ASTNode *expr=parse_comparison(parser);
         if(parser->current_token.type==TOKEN_RPAREN)
         {
             advance(parser);

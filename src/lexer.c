@@ -68,6 +68,40 @@ Token lexer_next_token(Lexer *lexer)
         }
         return t;
     }
+    if(c=='=')
+    {
+        advance(lexer);
+        if(peek(lexer)=='=')
+        {
+            advance(lexer);
+            Token t={TOKEN_EQ,"==",lexer->line};
+            return t;
+        }
+        Token t={TOKEN_ASSIGN,"=",lexer->line};
+        return t;
+    }
+    if(c=='!')
+    {
+        advance(lexer);
+        if(peek(lexer)=='=')
+        {
+            advance(lexer);
+            Token t={TOKEN_NEQ,"!=",lexer->line};
+            return t;
+        }
+    }
+    if(c=='<')
+    {
+        advance(lexer);
+        Token t={TOKEN_LT,"<",lexer->line};
+        return t;
+    }
+    if(c=='>')
+    {
+        advance(lexer);
+        Token t={TOKEN_GT,">",lexer->line};
+        return t;
+    }
     if(isalpha(c) || c == '_') 
     {
         Token t;

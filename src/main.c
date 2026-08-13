@@ -52,6 +52,9 @@ void print_ast(ASTNode *node,int level)
 }
 int main(int argc,char *argv[])
 {
+    printf("Started\n");
+    fflush(stdout);
+
     if(argc<2)
     {
         printf("Usage: %s <filename.cris>\n",argv[0]);
@@ -74,8 +77,8 @@ int main(int argc,char *argv[])
         printf("\n---Running Evaluator---\n");
         environment env;
         env_init(&env);
-        eval(root,&env);
-        printf("Final Result: %d\n",eval(root,&env));
+        int result=eval(root,&env);
+        printf("Final Result: %d\n",result);
         fflush(stdout);
     }
     else

@@ -73,6 +73,22 @@ int eval(ASTNode *node,environment *env)
     {
         return atoi(node->name);
     }
+    if(node->type==NODE_LT)
+    {
+        return eval(node->left,env) < eval(node->right,env);
+    }
+    if(node->type==NODE_GT)
+    {
+        return eval(node->left,env) > eval(node->right,env);
+    }
+    if(node->type==NODE_EQ)
+    {
+        return eval(node->left,env) == eval(node->right,env);
+    }
+    if(node->type==NODE_NEQ)
+   {
+        return eval(node->left,env) != eval(node->right,env);
+    }
     if(node->type==NODE_ADD)
     {
         return eval(node->left,env) + eval(node->right,env);

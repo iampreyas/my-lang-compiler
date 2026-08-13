@@ -9,6 +9,11 @@ typedef enum
     NODE_VAR,
     NODE_BLOCK,
     NODE_STRING,
+    NODE_BINARY_OP,
+    NODE_LT,
+    NODE_GT,
+    NODE_EQ,
+    NODE_NEQ,
     NODE_ADD,
     NODE_SUB,
     NODE_MUL,
@@ -32,4 +37,5 @@ typedef struct
 void parser_init(Parser *parser,Lexer *lexer);
 ASTNode* parse_statement(Parser *parser);
 ASTNode* parse_program(Parser *parser);
+ASTNode* parse_comparison(Parser *parser);
 #endif
