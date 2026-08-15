@@ -19,6 +19,8 @@ typedef enum
     TOKEN_NEQ,
     TOKEN_LT,
     TOKEN_GT,
+    TOKEN_IF,
+    TOKEN_ELSE,
     TOKEN_MUL,
     TOKEN_DIV,
     TOKEN_UNKNOWN,

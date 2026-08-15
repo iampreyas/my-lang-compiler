@@ -2,167 +2,220 @@
 #include<stdlib.h>
 #include<string.h>
 #include<ctype.h>
-#include "lexer.h"
+#include "../include/lexer.h"
+
 void lexer_init(Lexer *lexer,const char *source)
 {
     lexer->source=source;
     lexer->cursor=0;
     lexer->line=1;
 }
+
 static char peek(Lexer *lexer)
 {
     return lexer->source[lexer->cursor];
 }
-static char advance(Lexer *lexer)
+
+static char peek_next(Lexer *lexer)
 {
-    return lexer->source[lexer->cursor++];
+    if(lexer->source[lexer->cursor]=='\0')
+    {
+        return '\0';
+    }
+    return lexer->source[lexer->cursor+1];
 }
-static void skip_whitespace(Lexer *lexer)
+
+static char advance_char(Lexer *lexer)
 {
-    while(peek(lexer)==' '||peek(lexer)=='\t'||peek(lexer)=='\r'||peek(lexer)=='\n')
+    char c=lexer->source[lexer->cursor];
+    lexer->cursor++;
+    if(c=='\n')
     {
-        if(peek(lexer)=='\n')
-        {
-            lexer->line++;
-        }
-        advance(lexer);
+        lexer->line++;
     }
+    return c;
 }
-Token lexer_next_token(Lexer *lexer)
+
+static void skip_whitespace_and_comments(Lexer *lexer)
 {
-    skip_whitespace(lexer);
-    char c=peek(lexer);
-    if(c=='\0')
+    for(;;)
     {
-        Token t={TOKEN_EOF,"EOF",lexer->line};
-        return t;
-    }
-    if(isdigit(c))
-    {
-        Token t;
-        t.type=TOKEN_INT;
-        t.line=lexer->line;
-        int i=0;
-        while (isdigit(peek(lexer)) && i<63)
+        char c=peek(lexer);
+        if(c==' '||c=='\t'||c=='\r'||c=='\n')
         {
-            t.lexeme[i++]=advance(lexer);
+            advance_char(lexer);
         }
-        t.lexeme[i]='\0';
-        return t;
-    }
-    if(peek(lexer)=='"')
-    {
-        advance(lexer);
-        Token t;
-        t.line=lexer->line;
-        t.type=TOKEN_STRING;
-        int i=0;
-        while(peek(lexer) != '"' && peek(lexer) != '\0' && i<63)
+        else if(c=='/' && peek_next(lexer)=='/')
         {
-            t.lexeme[i++]=advance(lexer);
-        }
-        t.lexeme[i]='\0';
-        if(peek(lexer)=='"')
-        {
-            advance(lexer);
-        }
-        return t;
-    }
-    if(c=='=')
-    {
-        advance(lexer);
-        if(peek(lexer)=='=')
-        {
-            advance(lexer);
-            Token t={TOKEN_EQ,"==",lexer->line};
-            return t;
-        }
-        Token t={TOKEN_ASSIGN,"=",lexer->line};
-        return t;
-    }
-    if(c=='!')
-    {
-        advance(lexer);
-        if(peek(lexer)=='=')
-        {
-            advance(lexer);
-            Token t={TOKEN_NEQ,"!=",lexer->line};
-            return t;
-        }
-    }
-    if(c=='<')
-    {
-        advance(lexer);
-        Token t={TOKEN_LT,"<",lexer->line};
-        return t;
-    }
-    if(c=='>')
-    {
-        advance(lexer);
-        Token t={TOKEN_GT,">",lexer->line};
-        return t;
-    }
-    if(isalpha(c) || c == '_') 
-    {
-        Token t;
-        t.line = lexer->line;
-        int i = 0;
-        while((isalnum(peek(lexer)) || peek(lexer) == '_') && i < 63)
-        {
-            t.lexeme[i++] = advance(lexer);
-        }
-        t.lexeme[i]='\0';
-        if(strcmp(t.lexeme, "print") == 0)
-        {
-            t.type = TOKEN_PRINT;
+            while(peek(lexer)!='\n' && peek(lexer)!='\0')
+            {
+                advance_char(lexer);
+            }
         }
         else
         {
-            t.type = TOKEN_IDENTIFIER;
+            break;
         }
-        return t;
     }
-    advance(lexer);
-    Token t;
-    t.line=lexer->line;
-    t.lexeme[0]=c;
-    t.lexeme[1]='\0';
-    switch (c)
+}
+
+static Token make_token(TokenType type,const char *lexeme,int line)
+{
+    Token token;
+    token.type=type;
+    token.line=line;
+    if(lexeme)
     {
-        case '=':
-            t.type = TOKEN_ASSIGN;
-            break;
-        case '+':
-            t.type = TOKEN_PLUS;
-            break;
-        case '-':
-            t.type = TOKEN_MINUS;
-            break;
-        case '*':
-            t.type = TOKEN_MUL;
-            break;
-        case '/':
-            t.type = TOKEN_DIV;
-            break;
-        case '(':
-            t.type = TOKEN_LPAREN;
-            break;
-        case ')':
-            t.type = TOKEN_RPAREN;
-            break;
-        case '[':
-            t.type = TOKEN_LBRACKET;
-            break;
-        case ']':
-            t.type = TOKEN_RBRACKET;
-            break;
-        case ',':
-            t.type = TOKEN_COMMA;
-            break;
-        default:
-            t.type = TOKEN_UNKNOWN;
-            break;
+        strncpy(token.lexeme,lexeme,sizeof(token.lexeme)-1);
+        token.lexeme[sizeof(token.lexeme)-1]='\0';
+    }
+    else
+    {
+        token.lexeme[0]='\0';
+    }
+    return token;
+}
+
+static Token read_number(Lexer *lexer)
+{
+    int start=lexer->cursor;
+    int line=lexer->line;
+    while(isdigit((unsigned char)peek(lexer)))
+    {
+        advance_char(lexer);
+    }
+    int len=lexer->cursor-start;
+    char buffer[64];
+    if(len>=(int)sizeof(buffer))
+    {
+        len=sizeof(buffer)-1;
+    }
+    strncpy(buffer,lexer->source+start,len);
+    buffer[len]='\0';
+    return make_token(TOKEN_INT,buffer,line);
+}
+
+static Token read_identifier(Lexer *lexer)
+{
+    int start=lexer->cursor;
+    int line=lexer->line;
+    while(isalnum((unsigned char)peek(lexer)) || peek(lexer)=='_')
+    {
+        advance_char(lexer);
+    }
+    int len=lexer->cursor-start;
+    char buffer[64];
+    if(len>=(int)sizeof(buffer))
+    {
+        len=sizeof(buffer)-1;
+    }
+    strncpy(buffer,lexer->source+start,len);
+    buffer[len]='\0';
+
+    if(strcmp(buffer,"print")==0)
+    {
+        return make_token(TOKEN_PRINT,buffer,line);
+    }
+    if(strcmp(buffer,"if")==0)
+    {
+        return make_token(TOKEN_IF,buffer,line);
+    }
+    if(strcmp(buffer,"else")==0)
+    {
+        return make_token(TOKEN_ELSE,buffer,line);
+    }
+    return make_token(TOKEN_IDENTIFIER,buffer,line);
+}
+
+static Token read_string(Lexer *lexer)
+{
+    int line=lexer->line;
+    advance_char(lexer); /* skip opening quote */
+    int start=lexer->cursor;
+    while(peek(lexer)!='"' && peek(lexer)!='\0')
+    {
+        advance_char(lexer);
+    }
+    int len=lexer->cursor-start;
+    char buffer[64];
+    if(len>=(int)sizeof(buffer))
+    {
+        len=sizeof(buffer)-1;
+    }
+    strncpy(buffer,lexer->source+start,len);
+    buffer[len]='\0';
+    if(peek(lexer)=='"')
+    {
+        advance_char(lexer); /* skip closing quote */
+    }
+    else
+    {
+        printf("[ERROR] Unterminated string on line %d\n",line);
+    }
+    return make_token(TOKEN_STRING,buffer,line);
+}
+
+Token lexer_next_token(Lexer *lexer)
+{
+    skip_whitespace_and_comments(lexer);
+
+    int line=lexer->line;
+    char c=peek(lexer);
+
+    if(c=='\0')
+    {
+        return make_token(TOKEN_EOF,NULL,line);
     }
 
-    return t;
+    if(isdigit((unsigned char)c))
+    {
+        return read_number(lexer);
+    }
+
+    if(isalpha((unsigned char)c) || c=='_')
+    {
+        return read_identifier(lexer);
+    }
+
+    if(c=='"')
+    {
+        return read_string(lexer);
+    }
+
+    /* two-character operators first */
+    if(c=='=' && peek_next(lexer)=='=')
+    {
+        advance_char(lexer);
+        advance_char(lexer);
+        return make_token(TOKEN_EQ,"==",line);
+    }
+    if(c=='!' && peek_next(lexer)=='=')
+    {
+        advance_char(lexer);
+        advance_char(lexer);
+        return make_token(TOKEN_NEQ,"!=",line);
+    }
+
+    advance_char(lexer);
+    switch(c)
+    {
+        case '=': return make_token(TOKEN_ASSIGN,"=",line);
+        case '+': return make_token(TOKEN_PLUS,"+",line);
+        case '-': return make_token(TOKEN_MINUS,"-",line);
+        case '*': return make_token(TOKEN_MUL,"*",line);
+        case '/': return make_token(TOKEN_DIV,"/",line);
+        case '<': return make_token(TOKEN_LT,"<",line);
+        case '>': return make_token(TOKEN_GT,">",line);
+        case '(': return make_token(TOKEN_LPAREN,"(",line);
+        case ')': return make_token(TOKEN_RPAREN,")",line);
+        case '[': return make_token(TOKEN_LBRACKET,"[",line);
+        case ']': return make_token(TOKEN_RBRACKET,"]",line);
+        case ',': return make_token(TOKEN_COMMA,",",line);
+        default:
+        {
+            char unknown[2]={c,'\0'};
+            printf("[ERROR] Unknown character '%c' on line %d\n",c,line);
+            return make_token(TOKEN_UNKNOWN,unknown,line);
+        }
+    }
 }

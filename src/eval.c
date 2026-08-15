@@ -111,6 +111,19 @@ int eval(ASTNode *node,environment *env)
         }
         return eval(node->left,env) / right_val;
     }
+    if(node->type==NODE_IF)
+    {
+        int cond_value=eval(node->children[0],env);
+        if(cond_value)
+        {
+            return eval(node->children[1],env);
+        }
+        else if(node->child_count>2)
+        {
+            return eval(node->children[2],env);
+        }
+        return 0;
+    }
     if(node->type==NODE_ASSIGN)
     {
         int val=eval(node->right,env);

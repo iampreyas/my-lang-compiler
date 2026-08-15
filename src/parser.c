@@ -127,6 +127,26 @@ ASTNode* parse_statement(Parser *parser)
         add_child(print_node,expr);
         return print_node;
     }
+    if(parser->current_token.type==TOKEN_IF)
+    {
+        advance(parser);
+        ASTNode *cond=parse_comparison(parser);
+        ASTNode *then_branch=parse_statement(parser);
+        ASTNode *else_branch=NULL;
+        if(parser->current_token.type==TOKEN_ELSE)
+        {
+            advance(parser);
+            else_branch=parse_statement(parser);
+        }
+        ASTNode *if_node=create_node(NODE_IF,"if");
+        add_child(if_node,cond);
+        add_child(if_node,then_branch);
+        if(else_branch)
+        {
+            add_child(if_node,else_branch);
+        }
+        return if_node;
+    }
     if(parser->current_token.type==TOKEN_IDENTIFIER)
     {
         char var_name[64];

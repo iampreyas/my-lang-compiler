@@ -14,6 +14,7 @@ typedef enum
     NODE_GT,
     NODE_EQ,
     NODE_NEQ,
+    NODE_IF,
     NODE_ADD,
     NODE_SUB,
     NODE_MUL,
