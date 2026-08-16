@@ -50,7 +50,9 @@ ASTNode* parse_primary(Parser *parser)
         advance(parser);
         return node;
     }
-    return NULL;
+    printf("[ERROR] unexpected token '%s'\n",parser->current_token.lexeme);
+    fflush(stdout);
+    exit(1);
 }
 ASTNode* parse_term(Parser *parser)
 {
@@ -127,6 +129,24 @@ ASTNode* parse_statement(Parser *parser)
         add_child(print_node,expr);
         return print_node;
     }
+    if(parser->current_token.type==TOKEN_LBRACE)
+    {
+        advance(parser);
+        ASTNode *block=create_node(NODE_BLOCK,"block");
+        while(parser->current_token.type!=TOKEN_RBRACE && parser->current_token.type!=TOKEN_EOF)
+        {
+            ASTNode *stmt=parse_statement(parser);
+            if(stmt)
+            {
+                add_child(block,stmt);
+            }
+        }
+        if(parser->current_token.type==TOKEN_RBRACE)
+        {
+            advance(parser);
+        }
+        return block;
+    }
     if(parser->current_token.type==TOKEN_IF)
     {
         advance(parser);
@@ -146,6 +166,16 @@ ASTNode* parse_statement(Parser *parser)
             add_child(if_node,else_branch);
         }
         return if_node;
+    }
+    if(parser->current_token.type==TOKEN_WHILE)
+    {
+        advance(parser);
+        ASTNode *cond=parse_comparison(parser);
+        ASTNode *body=parse_statement(parser);
+        ASTNode *while_node=create_node(NODE_WHILE,"while");
+        add_child(while_node,cond);
+        add_child(while_node,body);
+        return while_node;
     }
     if(parser->current_token.type==TOKEN_IDENTIFIER)
     {

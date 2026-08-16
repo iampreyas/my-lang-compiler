@@ -124,6 +124,10 @@ static Token read_identifier(Lexer *lexer)
     {
         return make_token(TOKEN_ELSE,buffer,line);
     }
+    if(strcmp(buffer,"while")==0)
+    {
+        return make_token(TOKEN_WHILE,buffer,line);
+    }
     return make_token(TOKEN_IDENTIFIER,buffer,line);
 }
 
@@ -211,6 +215,8 @@ Token lexer_next_token(Lexer *lexer)
         case '[': return make_token(TOKEN_LBRACKET,"[",line);
         case ']': return make_token(TOKEN_RBRACKET,"]",line);
         case ',': return make_token(TOKEN_COMMA,",",line);
+        case '{': return make_token(TOKEN_LBRACE,"{",line);
+        case '}': return make_token(TOKEN_RBRACE,"}",line);
         default:
         {
             char unknown[2]={c,'\0'};

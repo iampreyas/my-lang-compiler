@@ -1,6 +1,6 @@
-x=5
-if x<10 print("SMALL") else print("BIG")
-y=100
-if y==100 print("HUNDRED") else print("NOT HUNDRED")
-z=7*3+2
-print(z)
+i=1
+while i<5
+{
+    print(i)
+    i=i+1
+}
