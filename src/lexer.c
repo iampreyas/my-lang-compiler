@@ -124,6 +124,10 @@ static Token read_identifier(Lexer *lexer)
     {
         return make_token(TOKEN_ELSE,buffer,line);
     }
+    if(strcmp(buffer,"break")==0)
+    {
+        return make_token(TOKEN_BREAK,buffer,line);
+    }
     if(strcmp(buffer,"while")==0)
     {
         return make_token(TOKEN_WHILE,buffer,line);
@@ -185,8 +189,6 @@ Token lexer_next_token(Lexer *lexer)
     {
         return read_string(lexer);
     }
-
-    /* two-character operators first */
     if(c=='=' && peek_next(lexer)=='=')
     {
         advance_char(lexer);

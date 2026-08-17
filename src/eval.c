@@ -44,6 +44,10 @@ int eval(ASTNode *node,environment *env)
         for(int i=0;i<node->child_count;i++)
         {
             last_val=eval(node->children[i],env);
+            if(last_val==-999)
+            {
+                return -999;
+            }
         }
         return last_val;
     }
@@ -111,11 +115,19 @@ int eval(ASTNode *node,environment *env)
         }
         return eval(node->left,env) / right_val;
     }
+    if(node->type==NODE_BREAK)
+    {
+        return -999;
+    }
     if(node->type==NODE_WHILE)
     {
         while(eval(node->children[0],env))
         {
-            eval(node->children[1],env);
+           int res=eval(node->children[1],env);
+           if(res==-999)
+           {
+            break;
+           }
         }
         return 0;
     }

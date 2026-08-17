@@ -147,6 +147,11 @@ ASTNode* parse_statement(Parser *parser)
         }
         return block;
     }
+    if(parser->current_token.type==TOKEN_BREAK)
+    {
+        advance(parser);
+        return create_node(NODE_BREAK,"break");
+    }
     if(parser->current_token.type==TOKEN_IF)
     {
         advance(parser);
