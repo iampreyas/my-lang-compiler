@@ -54,9 +54,21 @@ ASTNode* parse_primary(Parser *parser)
     fflush(stdout);
     exit(1);
 }
+ASTNode* parse_unary(Parser *parser)
+{
+    if(parser->current_token.type==TOKEN_MINUS)
+    {
+        advance(parser);
+        ASTNode *operand = parse_unary(parser);
+        ASTNode *neg_node=create_node(NODE_NEGATE,"-");
+        add_child(neg_node,operand);
+        return neg_node;
+    }
+       return parse_primary(parser);
+}
 ASTNode* parse_term(Parser *parser)
 {
-    ASTNode *left=parse_primary(parser);
+    ASTNode *left=parse_unary(parser);
     while(parser->current_token.type==TOKEN_MUL || parser->current_token.type==TOKEN_DIV)
     {
         TokenType op=parser->current_token.type;

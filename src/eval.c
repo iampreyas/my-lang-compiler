@@ -90,8 +90,12 @@ int eval(ASTNode *node,environment *env)
         return eval(node->left,env) == eval(node->right,env);
     }
     if(node->type==NODE_NEQ)
-   {
+    {
         return eval(node->left,env) != eval(node->right,env);
+    }
+    if(node->type==NODE_NEGATE)
+    {
+        return -eval(node->children[0],env);
     }
     if(node->type==NODE_ADD)
     {

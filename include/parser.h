@@ -17,6 +17,7 @@ typedef enum
     NODE_IF,
     NODE_WHILE,
     NODE_BREAK,
+    NODE_NEGATE,
     NODE_ADD,
     NODE_SUB,
     NODE_MUL,
@@ -41,4 +42,5 @@ void parser_init(Parser *parser,Lexer *lexer);
 ASTNode* parse_statement(Parser *parser);
 ASTNode* parse_program(Parser *parser);
 ASTNode* parse_comparison(Parser *parser);
+ASTNode* parse_factor(Parser *parser);
 #endif
