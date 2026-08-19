@@ -18,6 +18,8 @@ typedef enum
     NODE_WHILE,
     NODE_BREAK,
     NODE_NEGATE,
+    NODE_NUMBER,
+    NODE_NOT,
     NODE_ADD,
     NODE_SUB,
     NODE_MUL,

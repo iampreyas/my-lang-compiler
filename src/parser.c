@@ -44,6 +44,18 @@ ASTNode* parse_primary(Parser *parser)
         advance(parser);
         return node;
     }
+    if(parser->current_token.type==TOKEN_TRUE)
+    {
+        ASTNode *node=create_node(NODE_INT,"1");
+        advance(parser);
+        return node;
+    }
+    if(parser->current_token.type==TOKEN_FALSE)
+    {
+        ASTNode *node=create_node(NODE_INT,"0");
+        advance(parser);
+        return node;
+    }
     if(parser->current_token.type==TOKEN_IDENTIFIER)
     {
         ASTNode *node=create_node(NODE_VAR,parser->current_token.lexeme);
@@ -56,6 +68,14 @@ ASTNode* parse_primary(Parser *parser)
 }
 ASTNode* parse_unary(Parser *parser)
 {
+    if(parser->current_token.type==TOKEN_BANG)
+    {
+        advance(parser);
+        ASTNode *operand=parse_primary(parser);
+        ASTNode *node=create_node(NODE_NOT,"!");
+        add_child(node,operand);
+        return node;
+    }
     if(parser->current_token.type==TOKEN_MINUS)
     {
         advance(parser);
@@ -64,7 +84,7 @@ ASTNode* parse_unary(Parser *parser)
         add_child(neg_node,operand);
         return neg_node;
     }
-       return parse_primary(parser);
+    return parse_primary(parser);
 }
 ASTNode* parse_term(Parser *parser)
 {
@@ -111,10 +131,26 @@ ASTNode* parse_comparison(Parser *parser)
 
         NodeType node_type;
         const char* op_str;
-        if(op==TOKEN_LT)      { node_type = NODE_LT;  op_str = "<"; }
-        else if(op==TOKEN_GT) { node_type = NODE_GT;  op_str = ">"; }
-        else if(op==TOKEN_EQ) { node_type = NODE_EQ;  op_str = "=="; }
-        else                  { node_type = NODE_NEQ; op_str = "!="; }
+        if(op==TOKEN_LT)     
+        { 
+            node_type = NODE_LT;  
+            op_str = "<"; 
+        }
+        else if(op==TOKEN_GT) 
+        {
+            node_type = NODE_GT;  
+            op_str = ">"; 
+        }
+        else if(op==TOKEN_EQ) 
+        { 
+            node_type = NODE_EQ;  
+            op_str = "=="; 
+        }
+        else                  
+        { 
+            node_type = NODE_NEQ; 
+            op_str = "!="; 
+        }
 
         ASTNode *new_node = create_node(node_type, op_str);
         new_node->left = left;

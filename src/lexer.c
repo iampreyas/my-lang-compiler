@@ -124,6 +124,14 @@ static Token read_identifier(Lexer *lexer)
     {
         return make_token(TOKEN_ELSE,buffer,line);
     }
+    if(strcmp(buffer,"true")==0)
+    {
+        return make_token(TOKEN_TRUE,"true",line);
+    }
+    if(strcmp(buffer,"false")==0)
+    {
+        return make_token(TOKEN_FALSE,"false",line);
+    }
     if(strcmp(buffer,"break")==0)
     {
         return make_token(TOKEN_BREAK,buffer,line);
@@ -138,7 +146,7 @@ static Token read_identifier(Lexer *lexer)
 static Token read_string(Lexer *lexer)
 {
     int line=lexer->line;
-    advance_char(lexer); /* skip opening quote */
+    advance_char(lexer); 
     int start=lexer->cursor;
     while(peek(lexer)!='"' && peek(lexer)!='\0')
     {
@@ -154,7 +162,7 @@ static Token read_string(Lexer *lexer)
     buffer[len]='\0';
     if(peek(lexer)=='"')
     {
-        advance_char(lexer); /* skip closing quote */
+        advance_char(lexer); 
     }
     else
     {
@@ -217,6 +225,7 @@ Token lexer_next_token(Lexer *lexer)
         case '[': return make_token(TOKEN_LBRACKET,"[",line);
         case ']': return make_token(TOKEN_RBRACKET,"]",line);
         case ',': return make_token(TOKEN_COMMA,",",line);
+        case '!': return make_token(TOKEN_BANG,"!",line);
         case '{': return make_token(TOKEN_LBRACE,"{",line);
         case '}': return make_token(TOKEN_RBRACE,"}",line);
         default:

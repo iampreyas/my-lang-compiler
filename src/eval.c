@@ -148,6 +148,11 @@ int eval(ASTNode *node,environment *env)
         }
         return 0;
     }
+    if(node->type==NODE_NOT)
+    {
+        int val=eval(node->children[0],env);
+        return !val;
+    }
     if(node->type==NODE_ASSIGN)
     {
         int val=eval(node->right,env);
