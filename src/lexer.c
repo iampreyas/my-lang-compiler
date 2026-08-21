@@ -174,25 +174,20 @@ static Token read_string(Lexer *lexer)
 Token lexer_next_token(Lexer *lexer)
 {
     skip_whitespace_and_comments(lexer);
-
     int line=lexer->line;
     char c=peek(lexer);
-
     if(c=='\0')
     {
         return make_token(TOKEN_EOF,NULL,line);
     }
-
     if(isdigit((unsigned char)c))
     {
         return read_number(lexer);
     }
-
     if(isalpha((unsigned char)c) || c=='_')
     {
         return read_identifier(lexer);
     }
-
     if(c=='"')
     {
         return read_string(lexer);
@@ -203,13 +198,24 @@ Token lexer_next_token(Lexer *lexer)
         advance_char(lexer);
         return make_token(TOKEN_EQ,"==",line);
     }
+    if(c=='&' && peek_next(lexer)=='&')
+    {
+        advance_char(lexer);
+        advance_char(lexer);
+        return make_token(TOKEN_AND,"&&",line);
+    }
+    if(c=='|' && peek_next(lexer)=='|')
+    {
+        advance_char(lexer);
+        advance_char(lexer);
+        return make_token(TOKEN_OR,"||",line);
+    }
     if(c=='!' && peek_next(lexer)=='=')
     {
         advance_char(lexer);
         advance_char(lexer);
         return make_token(TOKEN_NEQ,"!=",line);
     }
-
     advance_char(lexer);
     switch(c)
     {

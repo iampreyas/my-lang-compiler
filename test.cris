@@ -1,2 +1,14 @@
 a = true
-b = !a
+b = false
+print(a&&b)
+print(a||b)
+print(a&&true)
+print(false||false)
+if(a&&!b)
+{
+    print("AND")
+}
+if(b||a)
+{
+    print("OR")
+}

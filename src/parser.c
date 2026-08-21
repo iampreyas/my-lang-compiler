@@ -32,6 +32,21 @@ ASTNode* create_node(NodeType type,const char* name)
 }
 ASTNode* parse_primary(Parser *parser)
 {
+    if(parser->current_token.type==TOKEN_LPAREN)
+    {
+        advance(parser);
+        ASTNode *expr=parse_logical_or(parser);
+        if(parser->current_token.type==TOKEN_RPAREN)
+        {
+            advance(parser);
+        }
+        else
+        {
+            printf("[ERROR] Expected ')'\n");
+            exit(1);
+        }
+        return expr;
+    }
     if(parser->current_token.type==TOKEN_INT)
     {
         ASTNode *node=create_node(NODE_INT,parser->current_token.lexeme);
@@ -159,6 +174,32 @@ ASTNode* parse_comparison(Parser *parser)
     }
     return left;
 }
+ASTNode* parse_logical_and(Parser *parser)
+{
+    ASTNode *left=parse_comparison(parser);
+    while(parser->current_token.type==TOKEN_AND)
+    {
+        advance(parser);
+        ASTNode *new_node=create_node(NODE_AND,"&&");
+        new_node->left=left;
+        new_node->right=parse_comparison(parser);
+        left=new_node;
+    }
+    return left;
+}
+ASTNode* parse_logical_or(Parser *parser)
+{
+    ASTNode *left=parse_logical_and(parser);
+    while(parser->current_token.type==TOKEN_OR)
+    {
+        advance(parser);
+        ASTNode *new_node=create_node(NODE_OR,"||");
+        new_node->left=left;
+        new_node->right=parse_logical_and(parser);
+        left=new_node;
+    }
+    return left;
+}
 ASTNode* parse_statement(Parser *parser)
 {
     if(parser->current_token.type==TOKEN_PRINT)
@@ -168,7 +209,7 @@ ASTNode* parse_statement(Parser *parser)
         {
             advance(parser);
         }
-        ASTNode *expr=parse_comparison(parser);
+        ASTNode *expr=parse_logical_or(parser);
         if(parser->current_token.type==TOKEN_RPAREN)
         {
             advance(parser);
@@ -203,7 +244,7 @@ ASTNode* parse_statement(Parser *parser)
     if(parser->current_token.type==TOKEN_IF)
     {
         advance(parser);
-        ASTNode *cond=parse_comparison(parser);
+        ASTNode *cond=parse_logical_or(parser);
         ASTNode *then_branch=parse_statement(parser);
         ASTNode *else_branch=NULL;
         if(parser->current_token.type==TOKEN_ELSE)
@@ -223,7 +264,7 @@ ASTNode* parse_statement(Parser *parser)
     if(parser->current_token.type==TOKEN_WHILE)
     {
         advance(parser);
-        ASTNode *cond=parse_comparison(parser);
+        ASTNode *cond=parse_logical_or(parser);
         ASTNode *body=parse_statement(parser);
         ASTNode *while_node=create_node(NODE_WHILE,"while");
         add_child(while_node,cond);

@@ -18,6 +18,8 @@ typedef enum
     TOKEN_TRUE,
     TOKEN_FALSE,
     TOKEN_BANG,
+    TOKEN_AND,
+    TOKEN_OR,
     TOKEN_COMMA,
     TOKEN_PRINT,
     TOKEN_STRING,

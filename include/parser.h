@@ -20,6 +20,8 @@ typedef enum
     NODE_NEGATE,
     NODE_NUMBER,
     NODE_NOT,
+    NODE_AND,
+    NODE_OR,
     NODE_ADD,
     NODE_SUB,
     NODE_MUL,
@@ -45,4 +47,7 @@ ASTNode* parse_statement(Parser *parser);
 ASTNode* parse_program(Parser *parser);
 ASTNode* parse_comparison(Parser *parser);
 ASTNode* parse_factor(Parser *parser);
+ASTNode* parse_primary(Parser *parser);
+ASTNode* parse_logical_and(Parser *parser);
+ASTNode* parse_logical_or(Parser *parser);
 #endif
