@@ -136,6 +136,14 @@ static Token read_identifier(Lexer *lexer)
     {
         return make_token(TOKEN_BREAK,buffer,line);
     }
+    if(strcmp(buffer,"for")==0)
+    {
+        return make_token(TOKEN_FOR,buffer,line);
+    }
+    if(strcmp(buffer,"to")==0)
+    {
+        return make_token(TOKEN_TO,buffer,line);
+    }
     if(strcmp(buffer,"while")==0)
     {
         return make_token(TOKEN_WHILE,buffer,line);

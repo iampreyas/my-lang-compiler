@@ -1,14 +1,5 @@
-a = true
-b = false
-print(a&&b)
-print(a||b)
-print(a&&true)
-print(false||false)
-if(a&&!b)
+for i=1 to 5 
 {
-    print("AND")
+    print(i)
 }
-if(b||a)
-{
-    print("OR")
-}
+print("Done")

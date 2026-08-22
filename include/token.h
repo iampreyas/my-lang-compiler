@@ -20,6 +20,8 @@ typedef enum
     TOKEN_BANG,
     TOKEN_AND,
     TOKEN_OR,
+    TOKEN_FOR,
+    TOKEN_TO,
     TOKEN_COMMA,
     TOKEN_PRINT,
     TOKEN_STRING,

@@ -19,6 +19,7 @@ typedef enum
     NODE_BREAK,
     NODE_NEGATE,
     NODE_NUMBER,
+    NODE_FOR,
     NODE_NOT,
     NODE_AND,
     NODE_OR,

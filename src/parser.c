@@ -271,6 +271,40 @@ ASTNode* parse_statement(Parser *parser)
         add_child(while_node,body);
         return while_node;
     }
+    if(parser->current_token.type==TOKEN_FOR)
+    {
+        advance(parser);
+        if(parser->current_token.type!=TOKEN_IDENTIFIER)
+        {
+            printf("[ERROR] Expected variable name after 'for'\n");
+            exit(1);
+        }
+        char var_name[64];
+        strcpy(var_name,parser->current_token.lexeme);
+        advance(parser);
+        if(parser->current_token.type!=TOKEN_ASSIGN)
+        {
+            printf("[ERROR] Expected '=' after for variable\n");
+            exit(1);
+        }
+        advance(parser);
+        ASTNode *start=parse_expression(parser);
+        if(parser->current_token.type!=TOKEN_TO)
+        {
+            printf("[ERROR] Expected 'to' in for loop\n");
+            exit(1);
+        }
+        advance(parser);
+        ASTNode *end=parse_expression(parser);
+        ASTNode *body=parse_statement(parser);
+        ASTNode *for_node=create_node(NODE_FOR,"for");
+        ASTNode *var=create_node(NODE_VAR,var_name);
+        add_child(for_node,var);
+        add_child(for_node,start);
+        add_child(for_node,end);
+        add_child(for_node,body);
+        return for_node;
+    }
     if(parser->current_token.type==TOKEN_IDENTIFIER)
     {
         char var_name[64];

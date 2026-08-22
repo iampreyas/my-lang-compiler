@@ -135,6 +135,22 @@ int eval(ASTNode *node,environment *env)
         }
         return 0;
     }
+    if(node->type==NODE_FOR)
+    {
+        ASTNode *var_node=node->children[0];
+        int start=eval(node->children[1],env);
+        int end=eval(node->children[2],env);
+        for(int i=start;i<=end;i++)
+        {
+            set_var(env,var_node->name,i);
+            int res=eval(node->children[3],env);
+            if(res==-999)
+            {
+                break;
+            }
+        }
+        return 0;
+    }
     if(node->type==NODE_IF)
     {
         int cond_value=eval(node->children[0],env);
